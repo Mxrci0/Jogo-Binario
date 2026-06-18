@@ -62,6 +62,11 @@
       color:var(--tx);transition:border-color .15s,background .15s}
     .botao-categoria:hover{border-color:var(--bd2);background:var(--bg)}
     .icone-categoria{font-size:22px;margin-bottom:4px}
+    .lista-opcoes{margin-top:10px;padding:10px;border:1px solid var(--bd);border-radius:var(--r);background:var(--bg2)}
+    .lista-opcoes ul{list-style:none;display:grid;gap:8px}
+    .lista-opcoes li{font-size:13px;color:var(--tx2)}
+    .lista-opcoes strong{color:var(--tx);display:block;margin-bottom:2px}
+    .lista-opcoes span{display:block;line-height:1.4}
 
     /* Input */
     input{width:100%;font-size:14px;font-family:var(--font);padding:8px 12px;
@@ -99,6 +104,9 @@
     <div class="cartao">
       <div class="rotulo">Escolha uma categoria</div>
       <div class="grade-categorias" id="grade-categorias"></div>
+      <div class="lista-opcoes" id="lista-opcoes" style="display:none"></div>
+      <div class="mts"></div>
+      <button onclick="toggleOpcoes()" id="btn-ver-opcoes">Ver alternativas por categoria</button>
     </div>
     <div class="cartao">
       <div class="rotulo">Adicionar categoria</div>
@@ -265,7 +273,32 @@
       btn.onclick = () => startGame(name);
       g.appendChild(btn);
     });
+    const lista = document.getElementById('lista-opcoes');
+    lista.style.display = 'none';
+    document.getElementById('btn-ver-opcoes').textContent = 'Ver alternativas por categoria';
     go('tela-menu');
+  }
+
+  function listarAlternativas(node){
+    if(!node) return [];
+    if(leaf(node)) return [node.dado];
+    return listarAlternativas(node.sim).concat(listarAlternativas(node.nao));
+  }
+
+  function toggleOpcoes(){
+    const lista = document.getElementById('lista-opcoes');
+    const btn = document.getElementById('btn-ver-opcoes');
+    if(lista.style.display === 'none'){
+      lista.innerHTML = '<ul>' + Object.keys(cats).map(name => {
+        const itens = listarAlternativas(cats[name]);
+        return `<li><strong>${ICONS[name]||'🗂'} ${name}</strong><span>${itens.join(', ')}</span></li>`;
+      }).join('') + '</ul>';
+      lista.style.display = 'block';
+      btn.textContent = 'Ocultar alternativas';
+    } else {
+      lista.style.display = 'none';
+      btn.textContent = 'Ver alternativas por categoria';
+    }
   }
 
   // Inicia uma rodada com a categoria escolhida.
